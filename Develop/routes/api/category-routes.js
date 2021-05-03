@@ -80,7 +80,12 @@ router.put('/:id', async (req, res) => {
     if (!updateCategory) {
       res.status(404).json({ error: 'Category Not Found !!' });
     }
-    res.json(updateCategory);
+    else {
+      const updatedCategory = await Category.findOne({
+        where: { id }
+      });
+      res.json(updatedCategory);
+    }
   }
   catch (error) {
     res.json(error);
@@ -92,12 +97,15 @@ router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   const { category_name } = req.body;
   try {
-    const deletedCategory = Category.findOne({ category_name }, { where: { id } });
-    console.log(deletedCategory);
-    if (!deletedCategory) {
+    const deletedCategory = Category.findOne({ where: { id } });
+    console.log("Deleted CAtegory is ::" + deletedCategory);
+    // if (!deletedCategory) {
+    //   res.status(404).json({ error: 'This category does not exist' });
+    // }
+    const deleteCategory = await Category.destroy({ where: { id } });
+    if (!deleteCategory) {
       res.status(404).json({ error: 'This category does not exist' });
     }
-    const deleteCategory = await Category.destroy({ where: { id } });
     res.json(deletedCategory);
   }
   catch (e) {
