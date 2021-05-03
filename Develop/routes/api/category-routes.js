@@ -74,21 +74,15 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   // update a category by its `id` value
   const { id } = req.params;
-  const { category_name } = req.body;
+  const { category_id, category_name } = req.body;
   try {
-    const updateCategory = await Category.update(req.body, { category_name, where: { id } });
-    if (!updateCategory) {
-      res.status(404).json({ error: 'Category Not Found !!' });
-    }
-    else {
-      const updatedCategory = await Category.findOne({
-        where: { id }
-      });
-      res.json(updatedCategory);
-    }
+    await Category.update(
+      { category_name }, { where: { id } });
+    const updatedCategory = await Category.findOne({ where: { id } });
+    res.json(updatedCategory);
   }
   catch (error) {
-    res.json(error);
+    res.status(500).json(error);
   }
 });
 
@@ -97,16 +91,15 @@ router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   const { category_name } = req.body;
   try {
-    const deletedCategory = Category.findOne({ where: { id } });
-    console.log("Deleted CAtegory is ::" + deletedCategory);
-    // if (!deletedCategory) {
-    //   res.status(404).json({ error: 'This category does not exist' });
-    // }
+    const deletedCategory = await Category.findOne({ where: { id } });
+
     const deleteCategory = await Category.destroy({ where: { id } });
     if (!deleteCategory) {
       res.status(404).json({ error: 'This category does not exist' });
     }
     res.json(deletedCategory);
+    // res.json({ Message: 'Category Deleted' });
+
   }
   catch (e) {
     res.json(e);
