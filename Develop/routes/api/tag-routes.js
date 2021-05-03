@@ -36,11 +36,11 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   // create a new tag
   const { tag_name } = req.body;
   try {
-    const newTag = Tag.create(req.body, { tag_name });
+    const newTag = await Tag.create(req.body, { tag_name });
     res.json(newTag);
   } catch (e) {
     if (e) {
@@ -49,13 +49,15 @@ router.post('/', (req, res) => {
   }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   // update a tag's name by its `id` value
   const { id } = req.params;
   const { tag_name } = req.body;
   try {
-    const updateTag = Tag.update(req.body, { where: { id }, tag_name });
-    res.json(updateTag);
+
+    await Tag.update({ tag_name }, { where: { id } });
+    const updatedTag = await Tag.findOne({ where: { id } });
+    res.json(updatedTag);
 
   } catch (e) {
     if (e) {
@@ -68,14 +70,13 @@ router.delete('/:id', async (req, res) => {
   // delete on tag by its `id` value
   const { id } = req.params;
   try {
-    const deletedTag = Tag.findOne({ where: { id } });
+    const deletedTag = await Tag.findOne({ where: { id } });
     if (!deletedTag) {
       res.status(404).json({ Message: 'Tag not Found !!' });
     }
-    else {
-      await Tag.destroy({ where: { id } });
-      res.json(deletedTag);
-    }
+    await Tag.destroy({ where: { id } });
+    res.json(deletedTag);
+
   } catch (e) {
     if (e) {
       res.status(500).json(e);
