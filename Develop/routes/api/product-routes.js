@@ -141,6 +141,7 @@ router.delete('/:id', async (req, res) => {
       res.status(404).json({ Message: 'No Product Found !!' });
     }
     await Product.destroy({ where: { id } });
+    //Shows the product that has been deleted instead of a "Deleted message"
     res.json(deletedProduct);
   } catch (e) {
     if (e) {
